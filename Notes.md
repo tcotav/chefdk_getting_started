@@ -275,4 +275,24 @@ Ok, great.  We've got those, but where do they go in our recipe?  We need to put
 
 So we create it in the root of the jdemo cookbook directory and put those two lines into it.  Check any outstanding changes into git.
 
+ok, let's try that again with the convert
+
+    $ kitchen converge
+
+Failed again.  Same crap.  What in theeeeee WORLD is going on????  (This might not happen to you.  Bastards...).  Ok, here's what we'll do, we'll update all of the apt packages.  Maybe we're all just out of date.  So let's get our ancient ubuntu version updated a bit using apt and then we'll come back to this.
+
+But first, a word about attributes.  Attributes allow you to pass values or overrides into the cookbooks.  Attribute precedence is a bit of a complicated beast.  There are **7,421 different levels of precedence**.  There used to be **7,422** but one didn't make sense so they removed it.  Anyway, you set the level and then put in the key as you would in dealing with a ruby Hash.
+
+    <level>[<key>] = <value>
+
+I use `default` which is the... default.  If we wanted to be sure to force that puppy in there, we might use `normal` or `override`.  You can learn more about [attribute precedence here](http://docs.opscode.com/essentials_cookbook_attribute_files.html#attribute-precedence).  Writing cookbooks, you'll want to pull variables out of the actual recipes (i.e. don't hardcode stuff) and put them here.  There are more advanced ways of handling things like that.  I'm sure we'll stumble upon them later.  Now on to getting apt working.
+
+### Dusty Repos are bad
+
+Okay, everyone remembers how we add external cookbooks to our repo, right?  Yes, that's right -- `metadata.rb`
+
+We edit metadata.rb adding the following line:
+
+    depends "apt"
+
 
