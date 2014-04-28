@@ -6,3 +6,5 @@
 #
 # 
 #
+
+include_recipe 'tomcat'
