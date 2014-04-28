@@ -182,7 +182,7 @@ We use Berkshelf to help us manage cookbook dependencies.  Like we need tomcat f
 
 `metadata.rb`
 
-    name             ''
+    name             'jdemo'
     maintainer       ''
     maintainer_email ''
     license          ''
@@ -199,24 +199,16 @@ At the bottom, we add the line:
 
 Oooookay, let's have a go with that.  We're going to run Berkshelf and tell it to go and get all of the dependencies for the tomcat cookbook.
 
-At the command line:
-
-    $ berks
-    Ridley::Errors::MissingNameAttribute The metadata at '~/jdemo/cookbooks/jdemo' does not contain a 'name' attribute. While Chef does not strictly enforce this requirement, Ridley cannot continue without a valid metadata 'name' entry.
-
-
-Sigh... so maybe this'll get fixed in some codegen somewhere, but its my bad for not taking my time and filling out the fields in metadata.rb.  So, let's put `jdemo` in the name field of `metadata.rb` and try again with `berks install`.
-
     $ berks install
     Resolving cookbook dependencies...
     Fetching 'jdemo' from source at .
     Fetching cookbook index from https://api.berkshelf.com...
-    Installing java (1.22.0)
-    Using openssl (1.1.0)
-    Installing tomcat (0.15.12)
+    Using java (1.22.0)
     Using jdemo (0.1.0) from source at .
+    Using openssl (1.1.0)
+    Using tomcat (0.15.12)
 
-Time for happy dance.  It worked.
+Time for happy dance.  It worked.  Commit metadata.rb changes into git.
 
 What happened?  Well, using the Power of Berkshelf (tm) we imported cookbooks and dependencies by just including the name of the desired cookbook in the metadata.rb and then invoking the `berks` command to install them.  If you want to go and confirm that these new cookbooks are around, you can do a
 
@@ -243,14 +235,44 @@ Close and write the file.
 
 Do a quick check-in to git (because that's how we all roll and we're on the dev branch after all...)
 
-Huh... so apparently, cookbooks or rather /cookbooks are part of the default .gitignore dropped by chef generate app <name>.  So I'm going to edit that, but I'm wondering if its supposed to magically pull the cookbooks from other local repo rather than have me WRITING them in the created subdir...
-
-Fix -- remove line, `cookbooks/` from .gitignore and then import the entire cookbook subdirectory.
 
 ### Run Kitchen after some changes -- different node convergeance.
 
-$ kitchen converge
+Now we're going to see if what we put into place will work -- we'll use the converge command to once again spin up the chef run on the node.  This time though, we gave the recipe something to do.  Several somethings in fact as you'll see from the output of the following command:
+
+  $ kitchen converge
+
+Well I'm not going to lie -- that command just exploded all over my console.  TO THE WET WIPES!
+
+(Some time later...)
+
+It didn't particularly like installing openjdk-6.  Maybe it was some transient failure?  Ideally, I'd be using jdk 7 anyway.
+
+Wow -- this is a lot of stuff to install.
+
+       0 upgraded, 88 newly installed, 0 to remove and 5 not upgraded.
+       Need to get 66.4 MB of archives.
+
+Failed on retrieving something from the repo, fwiw.  Not my problem and yet -- totally my problem.  Let's try to force jdk 7.  How do we do something like that?  A good place to look is the README.md of the cookbook we're fiddling with.  In this case, java.
+
+### OMFG things went AWRY
+
+So we need to try to install a different version of java.  We probably should've done this at the start, but we were lazy.  So, first we go to the chef cookbook community site and look up java.
 
 
+Community Cookbook site link to [Java Cookbook](http://community.opscode.com/cookbooks/java).  This is scenic and all that.  Some pictures of funny looking people over in the right hand column.  We want to look at [this cookbook on github](http://community.opscode.com/cookbooks/java).
+
+(this is a hoot, isn't it?)
+
+On the java cookbook github page, scroll down to the README.md.  There we find the usage that we're looking for.  There's all kinds of stuff there that we could configure, but all we really want is `openjdk` version `7`.
+
+in the `Attributes` section, we find attributes that match what we want.  They are:
+
+node['java']['install_flavor'] = 'openjdk'    # this is the default, but humor me
+node['java']['jdk_version'] = '7'
+
+Ok, great.  We've got those, but where do they go in our recipe?  We need to put them into the file that doesn't exist -- `attributes/default.rb`
+
+So we create it in the root of the jdemo cookbook directory and put those two lines into it.  Check any outstanding changes into git.
 
 
