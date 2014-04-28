@@ -295,4 +295,27 @@ We edit metadata.rb adding the following line:
 
     depends "apt"
 
+Berkshelf is made aware of it because of the relationship we set up between it and the metadata.rb file.  We run
+
+    $ berks update
+    Resolving cookbook dependencies...
+    Fetching 'jdemo' from source at .
+    Fetching cookbook index from https://api.berkshelf.com...
+    Using apt (2.3.10)
+    Using jdemo (0.1.0) from source at .
+    Using tomcat (0.15.12)
+    Using openssl (1.1.0)
+    Using java (1.22.0)
+
+There's apt.  But that just grabs the cookbook.  We want our recipe to use it.  So we add a line just like the tomcat line, **BUT** we need it to update the local packages **BEFORE** it does the java install else... same failure.  However, if we did it in the reverse order, it would fail this time and might work next time.  Still, let's do it right (ish) this time.
+
+    $ kitchen converge
+
+And what to my wondering eyes did appear?  Well, not a lot of red error messages -- that's for sure.  It worked.  **Virtual High Five**
+
+Man, that was such a rabbit hole dive I need to take a moment to figure out what in the world was going on before it.
+
+(time passes)
+
+#### And now ACTUAL TESTING will occur
 
