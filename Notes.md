@@ -359,12 +359,81 @@ and then create a file, `tomcat.rb`, inside of that directory.
       [ "$result" -eq 1 ]
     }
 
+Okay, let's give that a test run.
 
-Later on, we'll take a jaunt into serverspec.  As an aside, we still have more to add to our cookbook's recipe -- right now we're just spinning up tomcat.  Remember the goal was to drop in our war file.  In addition to just that war file, we'll also be pushing a few configuration files over.
+    $ kitchen verify
+    $ kitchen verify
+    -----> Starting Kitchen (v1.2.1)
+    -----> Verifying <default-ubuntu-1204>...
+           Removing /tmp/busser/suites/bats
+    Uploading /tmp/busser/suites/bats/tomcat.bats (mode=0644)
+    -----> Running bats test suite
+     ✓ java is found in PATH
+     ✓ tomcat process is visible
+
+    2 tests, 0 failures
+           Finished verifying <default-ubuntu-1204> (0m0.95s).
+    -----> Kitchen is finished. (0m1.89s)
 
 
+Quick point there -- `kitchen verify` is what we do to verify that our test is working as we expect.  Invoking `kitchen test` would do a full test -- from spinning up a new vm, chef install, node converge, then test.  We'll do that later.  Probably.
+
+Okay, so we got `bats` working and doing some tests.  Let's check it into `git` and then move on to adding more features to our cookbook.
+
+# War -- huh!  Good God Y'All
+
+Now we're going to push our war file up to the vm and into the webapps directory of the tomcat install.
+
+The source that can be used to generate the war file is available in the [punter github repo](https://github.com/tcotav/punter).
+
+We need to get the file, `punter.war` into our cookbook directory into the files directory of the cookbook.  First, let's make a spot to place the file.  In the cookbook base directory, do the following:
+
+    mkdir -p files/default
+
+and then place the punter.war into that directory.  We can either compile your own version of it or pull the one that was (hackishly wedged) [placed into git](https://github.com/tcotav/punter/blob/master/punter.war?raw=true).  So when we're done, the full path to the war is: `files/default/punter.war`
+
+That's it for placing the file.  Now we need to modify our recipe to do something with it.  Time for some [`cookbook_file`](
+http://docs.opscode.com/resource_cookbook_file.html).
+
+Open the file `recipes/default.rb` and modify it so that it looks like the following:
 
 
+    #
+    # Cookbook Name:: jdemo
+    # Recipe:: default
+    #
+    # Copyright (C) 2014
+    #
+    #
+    #
+
+    include_recipe 'apt'
+    include_recipe 'tomcat'
+
+    cookbook_file "/var/lib/tomcat6/webapps/punter.war" do
+      source "punter.war"
+      mode 00744
+      owner 'root'
+      group 'root'
+    end
+
+
+All we're doing with this resource call is stating that we want the local `file/default/punter.war` source to be placed on the remote file system as `/var/lib/tomcat6/webapps/punter.war`
+
+We can check if anything explodes by running:
+
+    $ kitchen converge
+
+and then manually log into the host via
+
+    $ kitchen login
+
+and confirm two things:
+
+  1. that the file, `punter.war` is sitting in /var/lib/tomcat6/webapps
+  2. and that next to it is the unrolled war directory named `punter`
+
+Check it all into git and then we'll formalize those two tests.
 
 ### Footnotes:
 
