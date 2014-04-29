@@ -1,10 +1,29 @@
-## Dev starter using ChefDK bits
+## The Official Unofficial Getting Started with ChefDK Guide
 
-### Get your project started using new chef command
+
+### Overview
+
+* There is no scene imaginable that cannot be further enhanced by adding giant robots - Aristotle *
+
+![alt text](images/chefdk-01.png "ChefDK Overview")
+
+
+We're going to build a cookbook to support installing tomcat and a (canned) java war file on to an ubuntu host.  In doing this, we'll walk through the tools included in `chefdk` to help manage cookbooks and manage testing.
+
+You'll need:
+
+- [Get Chef DK](http://www.getchef.com/downloads/chef-dk/)
+- [Get Vagrant](http://vagrantup.com)
+
+
+
+### Get your project started using new `chef` command
+
+We're going to first generate a new cookbook.
 
     $ chef generate cookbook jdemo
 
-Take a peek at what you've done.
+Take a peek at what you've done.  We've got a skeleton of a cookbook.
 
     $ ls jdemo
     Berksfile	README.md	metadata.rb
@@ -12,22 +31,23 @@ Take a peek at what you've done.
 
 ### Get going with git immediately.
 
-I'm a fan of git flow -- [Git Flow](https://github.com/nvie/gitflow)
+Let's get our git going immediately.  Commit often (but you knew that).
 
-Change to your jdemo directory and then:
+I'm a fan of git flow -- [Git Flow](https://github.com/nvie/gitflow) -- as a base workflow and branching model for my git projects.
+
+Change to your newly created jdemo directory and then:
 
     $ git flow init
 
-I use the defaults for git flow.
+(I use the defaults for git flow.)
 
-
-I prefer using git flow as it keeps me in a pretty good workflow.  Right after init, it drops me into the develop branch.
+Right after init, it drops me into the develop branch.
 
     $ git branch
     * develop
     master
 
-(If you're in git, then just:  `$ git init` )
+(If you're using vanilla git, then just:  `$ git init` )
 
 Then do the initial commit:
 
@@ -51,12 +71,12 @@ Test drive the kitchen command:
 
     $ kitchen
 
-The docs on test-kitchen are awesome by the way -- [http://www.kitchen.ci].  I'd recommend taking a run through that tutorial.
+The [docs on test-kitchen](http://www.kitchen.ci) are awesome by the way.  I'd recommend taking a run through their entire tutorial.
 
 
 ### kitchen.yml -- configuring test kitchen
 
-The new `chef` tool though already set us up to run kitchen.  In your basedir, you'll find the file .kitchen.yml
+The new `chef` tool already set us up to run kitchen.  In your basedir, you'll find the kitchen config file `.kitchen.yml`
 
 `.kitchen.yml`
 
@@ -79,7 +99,7 @@ The new `chef` tool though already set us up to run kitchen.  In your basedir, y
 
 
 
-So by default, the `chef` app set you up to use [Vagrant](http://vagrantup.com) with the default of [Virtualbox](http://virtualbox.org) as your VM environment and including two vms: one centos and one ubuntu.
+By default, the `chef` app set you up to use [Vagrant](http://vagrantup.com) with the default of [Virtualbox](http://virtualbox.org) as your VM environment and including two vms: one centos and one ubuntu.
 
 We can confirm those by running the command as follows:
 
@@ -92,7 +112,7 @@ For general cookbook development, you'd want to hit up both the RH family and de
 
       - name: centos-6.4
 
-and test again:
+and list again:
 
     $ kitchen list
     Instance             Driver   Provisioner  Last Action
@@ -130,7 +150,7 @@ We can confirm our work with the following command:
 
     $ kitchen list
     Instance             Driver   Provisioner  Last Action
-    default-ubuntu-1304  Vagrant  ChefSolo     Created
+    default-ubuntu-1204  Vagrant  ChefSolo     Created
 
 
 
@@ -268,8 +288,8 @@ On the java cookbook github page, scroll down to the README.md.  There we find t
 
 in the `Attributes` section, we find attributes that match what we want.  They are:
 
-node['java']['install_flavor'] = 'openjdk'    # this is the default, but humor me
-node['java']['jdk_version'] = '7'
+    node['java']['install_flavor'] = 'openjdk'    # this is the default, but humor me
+    node['java']['jdk_version'] = '7'
 
 Ok, great.  We've got those, but where do they go in our recipe?  We need to put them into the file that doesn't exist -- `attributes/default.rb`
 
@@ -281,7 +301,7 @@ ok, let's try that again with the convert
 
 Failed again.  Same crap.  What in theeeeee WORLD is going on????  (This might not happen to you.  Bastards...).  Ok, here's what we'll do, we'll update all of the apt packages.  Maybe we're all just out of date.  So let's get our ancient ubuntu version updated a bit using apt and then we'll come back to this.
 
-But first, a word about attributes.  Attributes allow you to pass values or overrides into the cookbooks.  Attribute precedence is a bit of a complicated beast.  There are **7,421 different levels of precedence**.  There used to be **7,422** but one didn't make sense so they removed it.  Anyway, you set the level and then put in the key as you would in dealing with a ruby Hash.
+But first, a word about attributes.  Attributes allow you to pass values or overrides into the cookbooks.  Attribute precedence is a bit of a complicated beast.  There are **7,421 different levels of precedence**.  There used to be **7,422** but one didn't make sense so they removed it.<sup>[<a href="#link-1">1</a>]</sup>  Anyway, you set the level and then put in the key as you would in dealing with a ruby Hash.
 
     <level>[<key>] = <value>
 
@@ -319,3 +339,33 @@ Man, that was such a rabbit hole dive I need to take a moment to figure out what
 
 #### And now ACTUAL TESTING will occur
 
+For that headline to be true though -- we'll have to write some tests.  There are different kinds of tests and test-kitchen supports a variety.  First we're going to put some stuff into what is arguably the EASIEST test-kitchen supported test type: bats.  [Bats] (https://github.com/sstephenson/bats) stands for "bash automated testing system".  There are lots of examples there at the link.  To support this, we'll first make a test directory to use:
+
+    mkdir -p test/integration/default/bats
+
+and then create a file, `tomcat.rb`, inside of that directory.
+
+`tomcat.rb`
+
+    #!/usr/bin/env bats
+
+    @test "java is found in PATH" {
+      run which java
+      [ "$status" -eq 0 ]
+    }
+
+    @test "tomcat process is visible " {
+      result=$(ps aux | grep java | grep tomcat|wc -l)
+      [ "$result" -eq 1 ]
+    }
+
+
+Later on, we'll take a jaunt into serverspec.  As an aside, we still have more to add to our cookbook's recipe -- right now we're just spinning up tomcat.  Remember the goal was to drop in our war file.  In addition to just that war file, we'll also be pushing a few configuration files over.
+
+
+
+
+
+### Footnotes:
+
+<sup>[<a name="link-1">1</a>] - this is 100% fabricated.  See docs for real attribute hierarchy</sup>
