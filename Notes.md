@@ -3,7 +3,7 @@
 
 ### Overview
 
-* There is no scene imaginable that cannot be further enhanced by adding giant robots - Aristotle *
+*There is no scene imaginable that cannot be further enhanced by adding giant robots - Aristotle*
 
 ![alt text](images/chefdk-01.png "ChefDK Overview")
 
@@ -329,6 +329,18 @@ Berkshelf is made aware of it because of the relationship we set up between it a
 
 There's apt.  But that just grabs the cookbook.  We want our recipe to use it.  So we add a line just like the tomcat line, **BUT** we need it to update the local packages **BEFORE** it does the java install else... same failure.  However, if we did it in the reverse order, it would fail this time and might work next time.  Still, let's do it right (ish) this time.
 
+First we edit
+
+`recipes/default.rb`
+
+so that it looks like this
+
+
+    include_recipe 'apt'    # <---- we added this
+    include_recipe 'tomcat'
+
+and then let's give it a go!
+
     $ kitchen converge
 
 And what to my wondering eyes did appear?  Well, not a lot of red error messages -- that's for sure.  It worked.  **Virtual High Five**
@@ -380,7 +392,7 @@ Quick point there -- `kitchen verify` is what we do to verify that our test is w
 
 Okay, so we got `bats` working and doing some tests.  Let's check it into `git` and then move on to adding more features to our cookbook.
 
-# War -- huh!  Good God Y'All
+#### War -- huh!  Good God Y'All
 
 Now we're going to push our war file up to the vm and into the webapps directory of the tomcat install.
 
@@ -392,8 +404,7 @@ We need to get the file, `punter.war` into our cookbook directory into the files
 
 and then place the punter.war into that directory.  We can either compile your own version of it or pull the one that was (hackishly wedged) [placed into git](https://github.com/tcotav/punter/blob/master/punter.war?raw=true).  So when we're done, the full path to the war is: `files/default/punter.war`
 
-That's it for placing the file.  Now we need to modify our recipe to do something with it.  Time for some [`cookbook_file`](
-http://docs.opscode.com/resource_cookbook_file.html).
+That's it for placing the file.  Now we need to modify our recipe to do something with it.  Time for some [cookbook_file](http://docs.opscode.com/resource_cookbook_file.html).
 
 Open the file `recipes/default.rb` and modify it so that it looks like the following:
 
@@ -434,6 +445,43 @@ and confirm two things:
   2. and that next to it is the unrolled war directory named `punter`
 
 Check it all into git and then we'll formalize those two tests.
+
+Note,  I was going to switch over to `chefspec` here, but its not yet supported as of today.  Or at least properly supported.  So we'll revise this to use chefspec at some future date.
+
+For now, we'll continue writing our code in bats.  We've already defined our tests above -- now we just need to translate them into code.
+
+
+    @test "war is placed in proper location " {
+      run [ -f /var/lib/tomcat6/webapps/punter.war ]
+      [ "$status" -eq 0 ]
+    }
+
+
+    @test "war is unrolled" {
+      run [ -d /var/lib/tomcat6/webapps/punter ]
+      [ "$status" -eq 0 ]
+    }
+
+Append these two lines to your `test/integration/default/bats/tomcat.bats` file.  Basically we make use of bash's built in [file test operators](http://www.tldp.org/LDP/abs/html/fto.html) to confirm the war is in place AND that it had been properly unrolled.
+
+We run the test using the kitchen command:
+
+    $ kitchen verify
+    -----> Starting Kitchen (v1.2.1)
+    -----> Verifying <default-ubuntu-1304>...
+           Removing /tmp/busser/suites/bats
+    Uploading /tmp/busser/suites/bats/tomcat.bats (mode=0644)
+    -----> Running bats test suite
+     ✓ java is found in PATH
+     ✓ tomcat process is visible
+     ✓ war is placed in proper location
+     ✓ war is unrolled
+
+    4 tests, 0 failures
+           Finished verifying <default-ubuntu-1304> (0m1.00s).
+    -----> Kitchen is finished. (0m1.96s)
+
+Another successful test run.
 
 ### Footnotes:
 
