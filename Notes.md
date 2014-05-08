@@ -483,6 +483,92 @@ We run the test using the kitchen command:
 
 Another successful test run.
 
+
+#### Chefspec
+
+    mkdir -p test/integration/default/chefspec
+
+
+
+
+
+
+
+
+
+## Part 2 -- Chef server, external VMs, and Serverspec
+
+#### Adding Serverspec
+
+Now we're going to jury rig server spec into our example and duplicate the `bats` testing that we did above.  Serverspec is another test platform that tests your actual servers via ssh.
+
+We want to make sure our environment is ready to go.  We assume that you've got ruby and bundler all ready to go.
+
+If you've got `bundler`, then simply
+
+`bundle`
+
+If you do NOT have `bundler`, then manually install
+
+`gem install serverspec`
+
+That's it for the grander setup.
+
+Of course, now we need a server to test against.  Test kitchen magically sets up a *SEEEECRET* vm to use for its tests, but its not clear (to me anyway) how we'd leverage that for this.  So we'll vagrant up our own.
+
+##### One more thing before we ServerSpec
+
+Let's go crazy.  For this, lets use an actual chef server.  TODO -- document all of that
+
+##### Serverspec vagrantup
+
+First we need grab a vagrant file.  I carry around the same basic uber vagrant file everywhere I go.
+
+
+
+##### Initializing serverspec
+
+[Alternate document source using kitchen + serverspec](http://kitchen.ci/docs/getting-started/writing-server-test)
+
+    mkdir -p test/integration/default/serverspec
+
+Now create our test file.  It must be an .rb file, and it should match the pattern *_spec.rb.
+
+    require 'serverspec'
+
+    include Serverspec::Helper::Exec
+    include Serverspec::Helper::DetectOS
+
+    RSpec.configure do |c|
+      c.before :all do
+        c.path = '/sbin:/usr/sbin'
+      end
+    end
+
+
+    # confirm the java install
+    describe command('java -version') do
+      its(:stderr) { should match /java version \"1.7/ }
+      it { should return_exit_status 0 }
+    end
+
+    describe package('tomcat') do
+      it { should be_installed }
+    end
+
+    describe port(8080) do
+      it { should be_listening }
+    end
+
+    describe file('/var/lib/tomcat6/webapps/punter.war') do
+      it { should be_file }
+    end
+
+    describe file('/var/lib/tomcat6/webapps/punter') do
+      it { should be_directory }
+    end
+
+
 ### Footnotes:
 
 <sup>[<a name="link-1">1</a>] - this is 100% fabricated.  See docs for real attribute hierarchy</sup>
