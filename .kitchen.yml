@@ -13,3 +13,7 @@ suites:
     run_list:
       - recipe[jdemo::default]
     attributes:
+  - name: server
+    run_list:
+      - recipe[jdemo::default]
+    attributes:

@@ -3,19 +3,11 @@ require 'serverspec'
 include Serverspec::Helper::Exec
 include Serverspec::Helper::DetectOS
 
-RSpec.configure do |c|
-  c.before :all do
-    c.path = '/sbin:/usr/sbin'
-  end
+describe package('openjdk-7-jdk') do
+  it { should be_installed }
 end
 
-# confirm the java install
-describe command('java -version') do
-  its(:stderr) { should match /java version \"1.7/ }
-  it { should return_exit_status 0 }
-end
-
-describe package('tomcat') do
+describe package('tomcat6') do
   it { should be_installed }
 end
 
