@@ -60,7 +60,9 @@ Git sanity check:
 And we're golden.  Next: test kitchen
 
 
-![alt text](images/chefdk-tk1.png "ChefDK Test Kitchen")
+<p align="center">
+  <img src='images/chefdk-tk1.png' alt="ChefDK Test Kitchen" />
+</p>
 ### setting up test kitchen
 
 With ChefDK installed, you've got test-kitchen all ready installed.  We're going to use it to write some tests for the cookbook that we're going to write in the latter steps so first things first.
@@ -241,6 +243,10 @@ We've got our supporting cookbooks.  Now let's take a little step to using them.
 
 ### First Cookbook Recipe
 
+<p align="center">
+  <img src='images/chefdk-knife.png' alt="Knife!!!!" />
+</p>
+
 If we run our kitchen job again, it will run the chef client on our virtual node.  It will use the runlist we specified in the `.kitchen.yml` but it still won't do anything.  Why's that?  Because we haven't done anything with the default recipe in jdemo.  Let's crack that file at:
 
 `cookbooks/jdemo/recipes/default.rb`
@@ -258,7 +264,7 @@ Do a quick check-in to git (because that's how we all roll and we're on the dev 
 
 Now we're going to see if what we put into place will work -- we'll use the converge command to once again spin up the chef run on the node.  This time though, we gave the recipe something to do.  Several somethings in fact as you'll see from the output of the following command:
 
-  $ kitchen converge
+    $ kitchen converge
 
 Well I'm not going to lie -- that command just exploded all over my console.  TO THE WET WIPES!
 
@@ -354,6 +360,10 @@ And what to my wondering eyes did appear?  Well, not a lot of red error messages
 Man, that was such a rabbit hole dive I need to take a moment to figure out what in the world was going on before it.
 
 (time passes)
+
+<p align="center">
+  <img src='images/chefdk-poke.png' alt="Testing Revealed" />
+</p>
 
 ### And now ACTUAL TESTING will occur
 
@@ -500,11 +510,14 @@ TBD -- this should magically work.  It does not.  So we delay for now.  I'm goin
 
 (time passes)
 
+<p align="center">
+  <img src='images/chefdk-sspec.png' alt="Server Spec" />
+</p>
 ### Adding Serverspec
 
 Now we're going to jury rig `serverspec` into our example and duplicate the `bats` testing that we did above.  Serverspec is another test platform that tests your actual servers via ssh.
 
-But wait, why would we write the same tests AGAIN?  What sort of testing is done by chefspec/bats and what is done by serverspec.  Well it is good that you asked that, Timmy.  Take a seat and let's fire up the magic whiteboard.  The heart of it is that we can run serverspec against any hosts.  So we're essentially writing tests that can be applied to deployments in QA, Dev, Stage, Production, and any other exotic sci-fi themed environment name you've got at your company.  It is portable.  If you can see it and ssh to it, you can run serverspec against it.  Kabooomz!]
+But wait, why would we write the same tests AGAIN?  What sort of testing is done by chefspec/bats and what is done by serverspec.  Well it is good that you asked that, Timmy.  Take a seat and let's fire up the magic whiteboard.  The heart of it is that we can run serverspec against any hosts.  So we're essentially writing tests that can be applied to deployments in QA, Dev, Stage, Production, and any other exotic sci-fi themed environment name you've got at your company.  It is portable.  If you can see it and ssh to it, you can run serverspec against it.
 
 That's all well and good, but for now, we just want test kitchen to spin up something and run serverspec tests against it.  We'll come back to testing against additional nodes.
 
@@ -542,7 +555,7 @@ First lets tell kitchen what we're doing.  We edit the `.kitchen.yml` file so th
           - recipe[jdemo::default]
         attributes:
 
-We added the server suite.  We'll make use of that shortly.
+We added the `server` suite.  We'll make use of that shortly.
 
 ### Initializing serverspec
 
@@ -583,7 +596,7 @@ How unexciting and unoriginal is that?  We just replicated the same tests we did
 
 So again, we run the same command to get this test going.  Note, since we moved this test into a separate suite, kitchen will build out a completely separate vm to work against.  I say this just so you're not surprised at how long this takes (just for the first go-around) and disk usage.
 
-`kitchen verify`
+    $ kitchen verify
 
 Fire that puppy off.  It will run both the default tests as well as the new server (serverspec based) tests.  Here's what a run of that should look like:
 
