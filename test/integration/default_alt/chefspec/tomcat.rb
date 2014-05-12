@@ -3,7 +3,7 @@ require 'default_alt'
 RSpec.configure do |c|
 end
 
-describe 'jdemo::default' do
+describe 'chefdk_getting_started::default' do
   let(:chef_run) { ChefSpec::Runner.new.converge(described_recipe) }
 
   it 'installs tomcat' do

@@ -1,5 +1,5 @@
 #
-# Cookbook Name:: jdemo
+# Cookbook Name:: chefdk_getting_started
 # Recipe:: default
 #
 # Copyright (C) 2014 
