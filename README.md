@@ -18,11 +18,11 @@ You'll need to:
 
 We're going to first generate a new cookbook.
 
-    $ chef generate cookbook jdemo
+    $ chef generate cookbook chefdk_getting_started
 
 Take a peek at what you've done.  We've got a skeleton of a cookbook.
 
-    $ ls jdemo
+    $ ls chefdk_getting_started
     Berksfile	README.md	metadata.rb
     chefignore	recipes
 
@@ -32,7 +32,7 @@ Let's get our git going immediately.  Commit often (but you knew that).
 
 I'm a fan of git flow -- [Git Flow](https://github.com/nvie/gitflow) -- as a base workflow and branching model for my git projects.  It may be a bit much for a documentation/sample project, but that's how I roll.
 
-Change to your newly created `jdemo` directory and then:
+Change to your newly created `chefdk_getting_started` directory and then:
 
     $ git flow init
 
@@ -130,7 +130,7 @@ Change this:
 To this:
 
     run_list:
-      - recipe[jdemo]
+      - recipe[chefdk_getting_started]
 
 Do a quick check-in of the change into git.
 
@@ -182,7 +182,9 @@ What do we need to do that?  First, lets add a few public cookbooks: `tomcat`, `
 Normally we'd start dicking around with a Gemfile to get `Berkshelf` installed to magically manage our cookbook dependencies, but `Berkshelf` is another component native to `chefdk` so yay team.
 
 
-Further, if you look inside the cookbook directory (where we'll be doing all of our custom cookbook work), you'll find the `jdemo` cookbook stubbed out for us by `chefdk`.
+Further, if you look inside the cookbook directory (where we'll be doing
+all of our custom cookbook work), you'll find the
+`chefdk_getting_started` cookbook stubbed out for us by `chefdk`.
 
 
 Inside that cookbook directory, you'll see
@@ -202,7 +204,7 @@ We use Berkshelf to help us manage cookbook dependencies.  Like we need tomcat f
 
 `metadata.rb`
 
-    name             'jdemo'
+    name             'chefdk_getting_started'
     maintainer       ''
     maintainer_email ''
     license          ''
@@ -221,10 +223,10 @@ Oooookay, let's have a go with that.  We're going to run Berkshelf and tell it t
 
     $ berks install
     Resolving cookbook dependencies...
-    Fetching 'jdemo' from source at .
+    Fetching 'chefdk_getting_started' from source at .
     Fetching cookbook index from https://api.berkshelf.com...
     Using java (1.22.0)
-    Using jdemo (0.1.0) from source at .
+    Using chefdk_getting_started (0.1.0) from source at .
     Using openssl (1.1.0)
     Using tomcat (0.15.12)
 
@@ -247,9 +249,12 @@ We've got our supporting cookbooks.  Now let's take a little step to using them.
   <img src='images/chefdk-knife.png' alt="Knife!!!!" />
 </p>
 
-If we run our kitchen job again, it will run the chef client on our virtual node.  It will use the runlist we specified in the `.kitchen.yml` but it still won't do anything.  Why's that?  Because we haven't done anything with the default recipe in jdemo.  Let's crack that file at:
+If we run our kitchen job again, it will run the chef client on our
+virtual node.  It will use the runlist we specified in the
+`.kitchen.yml` but it still won't do anything.  Why's that?  Because we
+haven't done anything with the default recipe in chefdk_getting_started.  Let's crack that file at:
 
-`cookbooks/jdemo/recipes/default.rb`
+`cookbooks/chefdk_getting_started/recipes/default.rb`
 
 The file currently only has comments (the hash (#) denotes a comment line in these files).  So at the end of the file add this line:
 
@@ -297,7 +302,8 @@ in the `Attributes` section, we find attributes that match what we want.  They a
 
 Ok, great.  We've got those, but where do they go in our recipe?  We need to put them into the file that doesn't exist -- `attributes/default.rb`
 
-So we create that directory path and then that file in the root of the jdemo cookbook directory and put those two lines into it.
+So we create that directory path and then that file in the root of the
+chefdk_getting_started cookbook directory and put those two lines into it.
 
 `mkdir attributes`
 
@@ -331,10 +337,10 @@ Berkshelf is made aware of it because of the relationship we set up between it a
 
     $ berks update
     Resolving cookbook dependencies...
-    Fetching 'jdemo' from source at .
+    Fetching 'chefdk_getting_started' from source at .
     Fetching cookbook index from https://api.berkshelf.com...
     Using apt (2.3.10)
-    Using jdemo (0.1.0) from source at .
+    Using chefdk_getting_started (0.1.0) from source at .
     Using tomcat (0.15.12)
     Using openssl (1.1.0)
     Using java (1.22.0)
@@ -425,7 +431,7 @@ Open the file `recipes/default.rb` and modify it so that it looks like the follo
 
 
     #
-    # Cookbook Name:: jdemo
+    # Cookbook Name:: chefdk_getting_started 
     # Recipe:: default
     #
     # Copyright (C) 2014
@@ -548,11 +554,11 @@ First lets tell kitchen what we're doing.  We edit the `.kitchen.yml` file so th
     suites:
       - name: default
         run_list:
-          - recipe[jdemo::default]
+          - recipe[chefdk_getting_started::default]
         attributes:
       - name: server
         run_list:
-          - recipe[jdemo::default]
+          - recipe[chefdk_getting_started::default]
         attributes:
 
 We added the `server` suite.  We'll make use of that shortly.
