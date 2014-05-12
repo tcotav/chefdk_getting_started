@@ -11,9 +11,9 @@ platforms:
 suites:
   - name: default
     run_list:
-      - recipe[jdemo::default]
+      - recipe[chefdk_getting_started::default]
     attributes:
   - name: server
     run_list:
-      - recipe[jdemo::default]
+      - recipe[chefdk_getting_started::default]
     attributes:
