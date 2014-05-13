@@ -1,6 +1,5 @@
 ## The Official Unofficial Getting Started with ChefDK Guide
-
-![alt text](images/chefdk-01.png "ChefDK Overview")
+![alt text](https://raw.githubusercontent.com/tcotav/chefdk_getting_started/master/images/chefdk-01.png "ChefDK Overview")
 *There is no scene imaginable that cannot be further enhanced by adding giant robots - Aristotle*
 
 ### Overview
@@ -61,7 +60,7 @@ And we're golden.  Next: test kitchen
 
 
 <p align="center">
-  <img src='images/chefdk-tk1.png' alt="ChefDK Test Kitchen" />
+  <img src='https://raw.githubusercontent.com/tcotav/chefdk_getting_started/master/images/chefdk-tk1.png' alt="ChefDK Test Kitchen" />
 </p>
 ### setting up test kitchen
 
@@ -246,7 +245,7 @@ We've got our supporting cookbooks.  Now let's take a little step to using them.
 ### First Cookbook Recipe
 
 <p align="center">
-  <img src='images/chefdk-knife.png' alt="Knife!!!!" />
+  <img src='https://raw.githubusercontent.com/tcotav/chefdk_getting_started/master/images/chefdk-knife.png' alt="Knife!!!!" />
 </p>
 
 If we run our kitchen job again, it will run the chef client on our
@@ -368,7 +367,7 @@ Man, that was such a rabbit hole dive I need to take a moment to figure out what
 (time passes)
 
 <p align="center">
-  <img src='images/chefdk-poke.png' alt="Testing Revealed" />
+  <img src='https://raw.githubusercontent.com/tcotav/chefdk_getting_started/master/images/chefdk-poke.png' alt="Testing Revealed" />
 </p>
 
 ### And now ACTUAL TESTING will occur
@@ -517,7 +516,7 @@ TBD -- this should magically work.  It does not.  So we delay for now.  I'm goin
 (time passes)
 
 <p align="center">
-  <img src='images/chefdk-sspec.png' alt="Server Spec" />
+  <img src='https://raw.githubusercontent.com/tcotav/chefdk_getting_started/master/images/chefdk-sspec.png' alt="Server Spec" />
 </p>
 ### Adding Serverspec
 
@@ -643,7 +642,6 @@ Fire that puppy off.  It will run both the default tests as well as the new serv
       should be directory
 
     Finished in 0.08279 seconds
-    5 examples, 0 failures
            Finished verifying <server-ubuntu-1304> (0m1.20s).
     -----> Kitchen is finished. (0m3.20s)
 
