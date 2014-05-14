@@ -1,4 +1,7 @@
 ## The Official Unofficial Getting Started with ChefDK Guide
+
+[Standalone HTML version](http://tcotav.github.io/chefdk_getting_started.html)
+
 ![alt text](https://raw.githubusercontent.com/tcotav/chefdk_getting_started/master/images/chefdk-01.png "ChefDK Overview")
 *There is no scene imaginable that cannot be further enhanced by adding giant robots - Aristotle*
 
@@ -11,7 +14,7 @@ You'll need to:
 - [get Chef DK](http://www.getchef.com/downloads/chef-dk/)
 - [get Vagrant](http://vagrantup.com)
 
-
+*NOTE* - ChefDK is still in early release.  So things will change.
 
 ### Get your project started using new `chef` command
 
