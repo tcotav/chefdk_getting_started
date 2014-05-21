@@ -309,7 +309,10 @@ chefdk_getting_started cookbook directory and put those two lines into it.
 
 `mkdir attributes`
 
-`vim attributes/default.rb` # or whatever text editor you use .  paste in the above text though.
+`vim attributes/default.rb` # or whatever text editor you use .  Paste in the text we grabbed from the README.md but we'll need to make a minor alteration so that it looks like this:
+
+    default['java']['install_flavor'] = 'openjdk'    # this is the default, but let's be EXPLICIT!
+    default['java']['jdk_version'] = '7'
 
 Check any outstanding changes into git.
 
