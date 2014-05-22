@@ -13,6 +13,7 @@ You'll need to:
 
 - [get Chef DK](http://www.getchef.com/downloads/chef-dk/)
 - [get Vagrant](http://vagrantup.com)
+- [supporting github repo] (https://github.com/tcotav/chefdk_getting_started) (optional)
 
 *NOTE* - ChefDK is still in early release.  So things will change.
 
@@ -21,7 +22,7 @@ You'll need to:
 We're going to first generate a new cookbook.
 
     $ chef generate cookbook chefdk_getting_started
-
+ 
 Take a peek at what you've done.  We've got a skeleton of a cookbook.
 
     $ ls chefdk_getting_started
@@ -284,7 +285,7 @@ Wow -- this is a lot of stuff to install.
        0 upgraded, 88 newly installed, 0 to remove and 5 not upgraded.
        Need to get 66.4 MB of archives.
 
-Failed on retrieving something from the repo, fwiw.  Not my problem and yet -- totally my problem.  Let's try to force jdk 7.  How do we do something like that?  A good place to look is the README.md of the cookbook we're fiddling with.  In this case, java.
+Failed on retrieving something from the repo, fwiw.  Not my problem and yet -- totally my problem.  Let's try to force jdk 7.  How do we do something like that?  A good place to look is the `README.md` of the cookbook we're fiddling with.  In this case, java.
 
 ### OMFG things went AWRY
 
@@ -297,30 +298,32 @@ Community Cookbook site link to [Java Cookbook](http://community.opscode.com/coo
 
 On the [java cookbook github page](http://community.opscode.com/cookbooks/java), scroll down to the README.md.  There we find the usage that we're looking for to grab openjdk version 7.  There's all kinds of stuff there that we could configure, but all we really want is `openjdk` version `7`.
 
-in the `Attributes` section, we find attributes that match what we want.  They are:
+In the `Attributes` section, we find attributes that match what we want.  They are:
 
-    node['java']['install_flavor'] = 'openjdk'    # this is the default, but humor me.  let's be EXPLICIT!
+    node['java']['install_flavor'] = 'openjdk'
     node['java']['jdk_version'] = '7'
 
 Ok, great.  We've got those, but where do they go in our recipe?  We need to put them into the file that doesn't exist -- `attributes/default.rb`
 
 So we create that directory path and then that file in the root of the
-chefdk_getting_started cookbook directory and put those two lines into it.
+`chefdk_getting_started` cookbook directory and put those two lines into it.
 
 `mkdir attributes`
 
-`vim attributes/default.rb` # or whatever text editor you use .  Paste in the text we grabbed from the README.md but we'll need to make a minor alteration so that it looks like this:
+`vim attributes/default.rb` # or whatever text editor you use .  
 
-    default['java']['install_flavor'] = 'openjdk'    # this is the default, but let's be EXPLICIT!
+Paste in the text we grabbed from the java cookbook's `README.md` but we'll need to make a minor alteration so that it looks like this:
+
+    default['java']['install_flavor'] = 'openjdk'  # this is the default, but let's be EXPLICIT!
     default['java']['jdk_version'] = '7'
 
 Check any outstanding changes into git.
 
-ok, let's try that again with the convert
+Let's try to converge our node again.
 
     $ kitchen converge
 
-Failed again.  Same crap.  What in theeeeee WORLD is going on????  (This might not happen to you.  Bastards...).  Ok, here's what we'll do, we'll update all of the apt packages.  Maybe we're all just out of date.  So let's get our ancient ubuntu version updated a bit using apt and then we'll come back to this.
+Failed again.  Same crap.  What in theeeeee WORLD is going on????  (This might not happen to you.  Bastards...).  Ok, here's what we'll do, we'll update all of the apt packages.  Maybe we're all just out of date (spoiler -- we are out of date).  So let's get our ancient ubuntu version updated a bit using apt and then we'll come back to this.
 
 ### But first, a word about attributes.
 
@@ -330,7 +333,7 @@ Attributes allow you to pass values or overrides into the cookbooks.  Attribute 
 
 I use `default` which is the... default.  If we wanted to be sure to force that puppy in there, we might use `normal` or `override`.  You can learn more about [attribute precedence here](http://docs.opscode.com/essentials_cookbook_attribute_files.html#attribute-precedence).  Writing cookbooks, you'll want to pull variables out of the actual recipes (i.e. don't hardcode stuff) and put them here.  There are more advanced ways of handling things like that.  I'm sure we'll stumble upon them later.  Now on to getting apt working.
 
-### Dusty Repos are bad -- back to our apt problem
+### Dusty install packages are bad
 
 Okay, everyone remembers how we add external cookbooks to our repo, right?  Yes, that's right -- `metadata.rb`
 
@@ -378,7 +381,7 @@ Man, that was such a rabbit hole dive I need to take a moment to figure out what
 
 ### And now ACTUAL TESTING will occur
 
-For that headline to be true though -- we'll have to write some tests.  There are different kinds of tests and test-kitchen supports a variety.  First we're going to put some stuff into what is arguably the EASIEST test-kitchen supported test type: bats.  [Bats](https://github.com/sstephenson/bats) stands for "bash automated testing system".  There are lots of examples there at the link.  To support this, we'll first make a test directory to use:
+For that headline to be true though -- we'll have to write some tests.  There are different kinds of tests, and test-kitchen supports a variety.  First we're going to put some stuff into what is arguably the EASIEST test-kitchen supported test type: bats.  [Bats](https://github.com/sstephenson/bats) stands for "bash automated testing system".  There are lots of examples there at the link.  To support this, we'll first make a test directory to use:
 
     mkdir -p test/integration/default/bats
 
@@ -414,17 +417,17 @@ Okay, let's give that a test run.
     -----> Kitchen is finished. (0m1.89s)
 
 
-Quick point there -- `kitchen verify` is what we do to verify that our test is working as we expect.  Invoking `kitchen test` would do a full test -- from spinning up a new vm, chef install, node converge, then test.  We'll do that later.  Probably.
+Quick point there -- `kitchen verify` is what we do to verify that our test is working as we expect.  It runs against the existing VM or it would sping up a new one if necessary.  Invoking `kitchen test` would do a full test -- from spinning up a new vm, chef install, node converge, then test.  We'll do that later.  Probably.
 
 Okay, so we got `bats` working and doing some tests.  Let's check it into `git` and then move on to adding more features to our cookbook.
 
 ### War -- huh!  Good God Y'All
 
-Now we're going to push our war file up to the vm and into the webapps directory of the tomcat install.
+Now we're going to push our java application archive file up to the vm and into the webapps directory of the tomcat install.
 
 The source that can be used to generate the war file is available in the [punter github repo](https://github.com/tcotav/punter).
 
-We need to get the file, `punter.war` into our cookbook directory into the files directory of the cookbook.  First, let's make a spot to place the file.  In the cookbook base directory, do the following:
+We need to get the file, `punter.war` into the files directory of the cookbook.  First, let's make a spot to place the file.  In the cookbook base directory, do the following:
 
     mkdir -p files/default
 
@@ -470,7 +473,7 @@ and confirm two things:
   1. that the file, `punter.war` is sitting in /var/lib/tomcat6/webapps
   2. and that next to it is the unrolled war directory named `punter`
 
-Check it all into git and then we'll turn those two tests into coded reproducable callable tests.  How sexy is that?
+Check it all into git and then we'll turn those two things we just checked on the vm into reproducible, callable tests.  How sexy is that?
 
 Note,  I was going to switch over to `chefspec` here, but its not yet supported as of today.  Or at least properly supported.  So we'll revise this to use chefspec at some future date.
 
@@ -526,13 +529,13 @@ TBD -- this should magically work.  It does not.  So we delay for now.  I'm goin
 </p>
 ### Adding Serverspec
 
-Now we're going to jury rig `serverspec` into our example and duplicate the `bats` testing that we did above.  Serverspec is another test platform that tests your actual servers via ssh.
+Now we're going to rig `serverspec` into our example and duplicate the `bats` testing that we did above.  Serverspec is another test platform that tests your actual servers via ssh.
 
-But wait, why would we write the same tests AGAIN?  What sort of testing is done by chefspec/bats and what is done by serverspec.  Well it is good that you asked that, Timmy.  Take a seat and let's fire up the magic whiteboard.  The heart of it is that we can run serverspec against any hosts.  So we're essentially writing tests that can be applied to deployments in QA, Dev, Stage, Production, and any other exotic sci-fi themed environment name you've got at your company.  It is portable.  If you can see it and ssh to it, you can run serverspec against it.
+But wait, why would we write the same tests AGAIN?  What sort of testing is done by chefspec/bats and what is done by serverspec?  Well it is good that you asked that, Timmy.  Take a seat and let's fire up the magic whiteboard.  The heart of it is that we can run serverspec against any hosts.  So we're essentially writing tests that can be applied to deployments in QA, Dev, Stage, Production, and any other exotic sci-fi themed environment name you've got at your company.  It is portable.  If you can see it and ssh to it, you can run serverspec against it.
 
-That's all well and good, but for now, we just want test kitchen to spin up something and run serverspec tests against it.  We'll come back to testing against additional nodes.
+That's all well and good, but for now, we just want test kitchen to spin up something and run serverspec tests against it.  We'll come back to testing against additional nodes in another article.
 
-First, we want to make sure our environment is ready to go.  We assume that you've got ruby and bundler all ready to go.
+First, we want to make sure our environment is ready to go.
 
 If you've got `bundler`, then simply
 
@@ -651,12 +654,12 @@ Fire that puppy off.  It will run both the default tests as well as the new serv
            Finished verifying <server-ubuntu-1304> (0m1.20s).
     -----> Kitchen is finished. (0m3.20s)
 
-Test kitchen run of serverspec works great.  So what about kicking off this against some random set of nodes?  You'll need to sit down for this.  Its just that awesome.
+Test kitchen run of serverspec works great.  So what about kicking off this against some random set of nodes?  Well, that's a different topic. 
 
 
 ### Serverspec, no test kitchen
 
-I'm going to put words here.  Good words.  Clear words.  You learn much.  Yes.
+I'm going to put words here.  Good words.  Clear words.  You learn much.  Yes.  Or I'll do it later in a different article.
 
 ### Footnotes:
 
