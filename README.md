@@ -385,9 +385,9 @@ For that headline to be true though -- we'll have to write some tests.  There ar
 
     mkdir -p test/integration/default/bats
 
-and then create a file, `tomcat.rb`, inside of that directory.
+and then create a file, `tomcat.bats`, inside of that directory.
 
-`tomcat.rb`
+`tomcat.bats`
 
     #!/usr/bin/env bats
 
