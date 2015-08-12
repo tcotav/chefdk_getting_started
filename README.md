@@ -5,6 +5,8 @@
 ![alt text](https://raw.githubusercontent.com/tcotav/chefdk_getting_started/master/images/chefdk-01.png "ChefDK Overview")
 *There is no scene imaginable that cannot be further enhanced by adding giant robots - Aristotle*
 
+## NOTE: this needs to get upgraded to use the current version of chefdk and serverspec.  pull requests welcome!
+
 ### Overview
 
 We're going to build a cookbook to support installing tomcat and a (canned) java war file on to an ubuntu host.  In doing this, we'll walk through the tools included in `chefdk` to help manage cookbooks and manage testing.
